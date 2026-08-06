@@ -208,7 +208,7 @@
   }
 
   /* -----------------------------------------------------
-     8. CONTACT FORM (demo — no backend wired up)
+     8. CONTACT FORM (Formspree AJAX Integration)
      ----------------------------------------------------- */
   var form = document.getElementById('contact-form');
   var formNote = document.getElementById('form-note');
@@ -216,8 +216,30 @@
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      formNote.textContent = 'Thanks — your message has been noted. We\'ll reply shortly.';
-      form.reset();
+      var formData = new FormData(form);
+
+      fetch(form.action, {
+        method: form.method,
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      }).then(function (response) {
+        if (response.ok) {
+          formNote.textContent = "Thanks! Your message has been sent successfully.";
+          form.reset();
+        } else {
+          response.json().then(function (data) {
+            if (Object.hasOwn(data, 'errors')) {
+              formNote.textContent = data.errors.map(function (error) { return error.message; }).join(", ");
+            } else {
+              formNote.textContent = "Oops! There was a problem submitting your form.";
+            }
+          });
+        }
+      }).catch(function (error) {
+        formNote.textContent = "Oops! There was a problem submitting your form.";
+      });
     });
   }
 
