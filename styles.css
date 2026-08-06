@@ -1001,3 +1001,93 @@ a.contact-info-line:hover{ color: var(--gold); }
   border-color: rgba(20,25,40,0.14);
   box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 16px 34px -18px rgba(0,0,0,0.5);
 }
+
+/* =========================================================
+   FLOATING WHATSAPP WIDGET
+   Fixed bottom-left, sits above normal content but below the
+   mobile menu (z-index 99) and its backdrop (z-index 98) so
+   it's naturally covered — not floating oddly — whenever the
+   mobile nav is open. WhatsApp's own green is used deliberately
+   here (rather than the site's gold accent) since it's the
+   universal, instantly-recognizable convention for this exact
+   kind of chat launcher.
+   ========================================================= */
+.whatsapp-widget{
+  position: fixed;
+  left: clamp(16px, 4vw, 28px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(16px, 4vw, 28px));
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #25d366, #1fb655);
+  color: #ffffff;
+  box-shadow: 0 10px 24px -8px rgba(37,211,102,0.55), 0 2px 6px rgba(0,0,0,0.35);
+  transition: filter var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease);
+}
+.whatsapp-widget:hover{
+  filter: brightness(1.15);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -8px rgba(37,211,102,0.65), 0 4px 10px rgba(0,0,0,0.4);
+}
+.whatsapp-widget:active{ transform: translateY(-1px); }
+
+.whatsapp-icon{ width: 30px; height: 30px; }
+
+/* Soft attention pulse — automatically disabled by the
+   prefers-reduced-motion override at the top of this file. */
+.whatsapp-widget::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #25d366;
+  opacity: .6;
+  animation: whatsapp-pulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes whatsapp-pulse{
+  0%   { transform: scale(1);   opacity: .55; }
+  100% { transform: scale(1.6); opacity: 0;   }
+}
+
+/* Hover-only text label, desktop/pointer devices */
+.whatsapp-tooltip{
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+  white-space: nowrap;
+  background: var(--header-bg-solid);
+  color: var(--header-text-hi);
+  font-size: .82rem;
+  font-weight: 600;
+  padding: .5rem .85rem;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--header-border);
+  box-shadow: 0 8px 20px -10px rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.whatsapp-widget:hover .whatsapp-tooltip{
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+@media (max-width: 560px){
+  .whatsapp-widget{ width: 52px; height: 52px; }
+  .whatsapp-icon{ width: 27px; height: 27px; }
+  /* Tooltip relies on hover, which doesn't really exist on touch —
+     hide it there so a stray tap can't leave it stuck open. */
+  .whatsapp-tooltip{ display: none; }
+}
+
+@media (hover: none){
+  .whatsapp-tooltip{ display: none; }
+}
